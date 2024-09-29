@@ -226,7 +226,7 @@ jobs:
           rm -rf ./sing-box* ./rules*
           mv -f ./*.json ./*.srs ../sing-box-ruleset-compatible/
 
-      - name: Delete old release assets
+      - name: Delete old clash release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
@@ -259,6 +259,16 @@ jobs:
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git push -f -u origin clash
 
+     - name: Delete old clash-ruleset release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ github.token }}
+          tag: clash-ruleset
+          assets: |
+            *.yaml
+            *.list
+            *.mrs
+            
       - name: Release and upload `clash-ruleset` assets
         uses: svenstaro/upload-release-action@v2
         with:
@@ -281,6 +291,14 @@ jobs:
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git push -f -u origin clash-ruleset
 
+     - name: Delete old sing-box release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ github.token }}
+          tag: sing-box
+          assets: |
+            *.db
+            
       - name: Release and upload `sing-box` assets
         uses: svenstaro/upload-release-action@v2
         with:
@@ -304,6 +322,15 @@ jobs:
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git push -f -u origin sing-box
 
+      - name: Delete old sing-box-ruleset release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ github.token }}
+          tag: sing-box-ruleset
+          assets: |
+            *.json
+            *.srs
+            
       - name: Release and upload `sing-box-ruleset` assets
         uses: svenstaro/upload-release-action@v2
         with:
@@ -326,6 +353,15 @@ jobs:
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git push -f -u origin sing-box-ruleset
 
+     - name: Delete old sing-box-ruleset-compatible release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ github.token }}
+          tag: sing-box-ruleset-compatible
+          assets: |
+            *.json
+            *.srs
+      
       - name: Release and upload `sing-box-ruleset-compatible` assets
         uses: svenstaro/upload-release-action@v2
         with:
