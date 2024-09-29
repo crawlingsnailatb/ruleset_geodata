@@ -353,7 +353,7 @@ jobs:
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git push -f -u origin sing-box-ruleset
 
-     - name: Delete old sing-box-ruleset-compatible release assets
+      - name: Delete old sing-box-ruleset-compatible release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
