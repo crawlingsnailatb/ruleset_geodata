@@ -226,6 +226,16 @@ jobs:
           rm -rf ./sing-box* ./rules*
           mv -f ./*.json ./*.srs ../sing-box-ruleset-compatible/
 
+      - name: Delete old release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ github.token }}
+          tag:
+          assets: |
+            *.mmdb
+            *.dat
+            *.metadb
+            
       - name: Release and upload `clash` assets
         uses: svenstaro/upload-release-action@v2
         with:
