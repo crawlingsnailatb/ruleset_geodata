@@ -259,7 +259,7 @@ jobs:
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git push -f -u origin clash
 
-     - name: Delete old clash-ruleset release assets
+      - name: Delete old clash-ruleset release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
@@ -291,7 +291,7 @@ jobs:
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git push -f -u origin clash-ruleset
 
-     - name: Delete old sing-box release assets
+      - name: Delete old sing-box release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
