@@ -230,7 +230,7 @@ jobs:
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
-          tag:
+          tag: clash
           assets: |
             *.mmdb
             *.dat
