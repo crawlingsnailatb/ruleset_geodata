@@ -17,7 +17,7 @@ jobs:
         run: |
           echo "update_version=$(date -d '+8 hours' +%Y-%m-%d)" >> ${GITHUB_ENV}
           echo "domains_download_url=https://raw.githubusercontent.com/DustinWin/domain-list-custom/domains" >> ${GITHUB_ENV}
-          echo "ips_download_url=https://raw.githubusercontent.com/DustinWin/geoip/ips" >> ${GITHUB_ENV}
+          echo "ips_download_url=https://github.com/DustinWin/geoip/releases/download/ips" >> ${GITHUB_ENV}
         shell: bash
 
       - name: Clone Repository
@@ -34,20 +34,6 @@ jobs:
         with:
           repository: v2fly/domain-list-community
           path: community
-
-      - name: Checkout DustinWin/geoip
-        uses: actions/checkout@v4
-        with:
-          repository: DustinWin/geoip
-          ref: clash
-          path: geoip/clash
-
-      - name: Checkout DustinWin/geoip
-        uses: actions/checkout@v4
-        with:
-          repository: DustinWin/geoip
-          ref: sing-box
-          path: geoip/sing-box
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -96,10 +82,26 @@ jobs:
       - name: Get geoip relative files
         run: |
           mkdir -p ./clash/ ./sing-box/
-          mv -f ./geoip/clash/*.mmdb ./clash/
-          mv -f ./geoip/clash/* ./community/
-          mv -f ./geoip/sing-box/* ./community/
-          rm -rf ./geoip*
+          # Download Clash geoip files (.mmdb)
+          clash_mmdb=($(curl -sSL https://api.github.com/repos/DustinWin/geoip/releases | grep '"browser_download_url"' | grep '.mmdb' | awk -F'"' '{print $4}'))
+          count_clash_mmdb=${#clash_mmdb[@]}
+          for ((i = 0; i < count_clash_mmdb; i++)); do
+            wget -P ./clash/ "${clash_mmdb[i]}"
+          done
+
+          # Download Clash other geoip files (except .mmdb)
+          clash_others=($(curl -sSL https://api.github.com/repos/DustinWin/geoip/releases | grep '"browser_download_url"' | grep '/clash/' | grep -v '.mmdb' | awk -F'"' '{print $4}'))
+          count_clash_others=${#clash_others[@]}
+          for ((i = 0; i < count_clash_others; i++)); do
+            wget -P ./community/ "${clash_others[i]}"
+          done
+
+          # Download sing-box all geoip files
+          singbox_all=($(curl -sSL https://api.github.com/repos/DustinWin/geoip/releases | grep '"browser_download_url"' | grep '/sing-box/' | awk -F'"' '{print $4}'))
+          count_singbox_all=${#singbox_all[@]}
+          for ((i = 0; i < count_singbox_all; i++)); do
+            wget -P ./community/ "${singbox_all[i]}"
+          done
 
       - name: Move `clash` and `sing-box` geodata files
         run: |
@@ -233,21 +235,11 @@ jobs:
           release_name: clash
           tag: clash
           overwrite: true
-          body: "[Clash](https://github.com/Dreamacro/clash) 规则集文件（包含 .dat、.mmdb 和 .metadb 文件）"
+          body: |
+            [Clash](https://github.com/Dreamacro/clash) 规则集文件（包含 .dat、.mmdb 和 .metadb 文件）
+            规则集文件文件更新于 ${{ env.update_version }}
           file_glob: true
           file: ./clash/*
-
-      - name: Git push assets to "clash" branch
-        run: |
-          cd ./clash/ || exit 1
-          git init
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b clash
-          git add .
-          git commit -m "Clash ruleset_geodata 文件更新于 ${update_version}"
-          git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
-          git push -f -u origin clash
 
       - name: Release and upload `clash-ruleset` assets
         uses: svenstaro/upload-release-action@v2
@@ -278,21 +270,11 @@ jobs:
           release_name: sing-box
           tag: sing-box
           overwrite: true
-          body: "[sing-box](https://github.com/SagerNet/sing-box) 规则集文件（包含 .db 文件）"
+          body: |
+            [sing-box](https://github.com/SagerNet/sing-box) 规则集文件（包含 .db 文件）
+            规则集文件更新于 ${{ env.update_version }}
           file_glob: true
           file: ./sing-box/*
-
-      - name: Git push assets to "sing-box" branch
-        run: |
-          cd ./sing-box/ || exit 1
-          git init
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b sing-box
-          git add .
-          git commit -m "sing-box ruleset_geodata 文件更新于 ${update_version}"
-          git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
-          git push -f -u origin sing-box
 
       - name: Release and upload `sing-box-ruleset` assets
         uses: svenstaro/upload-release-action@v2
